@@ -10,7 +10,7 @@
 ![Amazon Bedrock](https://img.shields.io/badge/AI-Amazon_Bedrock-0F6E6E?style=flat-square)
 ![Python](https://img.shields.io/badge/python-3.12-0F6E6E?style=flat-square)
 ![Checkov](https://img.shields.io/badge/policy_checks-passing-1E7F45?style=flat-square)
-![Status](https://img.shields.io/badge/status-deploying_to_us--east--2-E4572E?style=flat-square)
+![Status](https://img.shields.io/badge/status-live_on_AWS_us--east--2-1E7F45?style=flat-square)
 
 | | |
 |---|---|
