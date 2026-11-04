@@ -81,6 +81,16 @@ def lambda_handler(event, context):
         if not desc:
             return {"statusCode": 400, "body": json.dumps({"error": "description required"})}
         return {"statusCode": 200, "body": json.dumps(suggest_codes(desc))}
-    except Exception:
-        log.exception("suggestion_failed")
+    except Exception as e:
+        # One structured line with the cause, so diagnosis is a single log query.
+        # (AWS error messages name the service and reason; they never contain request text.)
+        err = getattr(e, "response", {}).get("Error", {}) if hasattr(e, "response") else {}
+        log.error(json.dumps({
+            "event": "suggestion_failed",
+            "error_type": err.get("Code") or type(e).__name__,
+            "error": (err.get("Message") or str(e))[:500],
+            "operation": getattr(e, "operation_name", None),
+            "version": os.environ.get("AWS_LAMBDA_FUNCTION_VERSION"),
+        }))
+        log.exception("failure_traceback")  # distinct name so the failure metric counts each error once
         return {"statusCode": 500, "body": json.dumps({"error": "internal error"})}
