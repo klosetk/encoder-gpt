@@ -17,6 +17,10 @@ AGENT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PARAMS="/encoder-gpt/${FLEET_ENV}/agent"
 UNIT="openclaw-gateway.service"
 
+# Every OpenClaw call gets a time limit and no keyboard input, so a hidden
+# interactive prompt or a stuck call can never freeze the script.
+oc() { timeout 120 openclaw "$@" </dev/null; }
+
 say() { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 
 param() {  # read an SSM parameter; empty string if it doesn't exist
@@ -26,9 +30,9 @@ param() {  # read an SSM parameter; empty string if it doesn't exist
 
 # ── 1. Brain: Bedrock via the instance role (no API key) ─────────────────────
 say "Configuring Bedrock (instance-role auth)"
-openclaw config patch --file "$AGENT_DIR/openclaw.bedrock.json5"
-openclaw config set plugins.entries.amazon-bedrock.config.discovery.enabled true
-openclaw config set plugins.entries.amazon-bedrock.config.discovery.region "$AWS_REGION"
+oc config patch --file "$AGENT_DIR/openclaw.bedrock.json5"
+oc config set plugins.entries.amazon-bedrock.config.discovery.enabled true
+oc config set plugins.entries.amazon-bedrock.config.discovery.region "$AWS_REGION"
 
 # ── 2. Skill: the runbook as something the agent can execute ─────────────────
 say "Installing fleet-ops skill"
@@ -79,9 +83,9 @@ if [[ "$READY" == 1 ]]; then
   printf '[Service]\nEnvironmentFile=%%h/.openclaw/fleet-agent.env\n' > "$HOME/.config/systemd/user/$UNIT.d/fleet-agent.conf"
 
   if [[ -n "$PLUGIN" ]]; then
-    openclaw plugins install "$PLUGIN" || echo "($PLUGIN already installed)"
+    oc plugins install "$PLUGIN" || echo "($PLUGIN already installed)"
   fi
-  openclaw config patch --file "$AGENT_DIR/channels/$CHANNEL_KIND.json5"
+  oc config patch --file "$AGENT_DIR/channels/$CHANNEL_KIND.json5"
 else
   echo "No $CHANNEL_KIND tokens in $PARAMS yet - skipping chat. Add them and re-run (see agent/README.md)."
 fi
@@ -96,13 +100,13 @@ systemctl --user --no-pager status "$UNIT" | head -5
 # ── 5. Schedules: proactive checks delivered to the chosen channel ───────────
 if [[ -n "$TARGET" ]]; then
   say "Scheduling health checks and daily digest -> $CHANNEL_KIND"
-  openclaw cron add \
+  oc cron add \
     --name "fleet-health-check" \
     --cron "7 8-18/2 * * 1-5" --tz "America/Chicago" \
     --message "Use the fleet-ops skill. Run the health check. If anything is in ALARM, diagnose and follow the rollback rules, then post the incident report. If healthy, reply with the one-line healthy status only." \
     --announce --channel "$CHANNEL_KIND" --to "$TARGET" || echo "(health check may already exist - see: openclaw cron list)"
 
-  openclaw cron add \
+  oc cron add \
     --name "fleet-daily-digest" \
     --cron "31 8 * * 1-5" --tz "America/Chicago" \
     --message "Use the fleet-ops skill. Post a morning digest for Encoder GPT: current live version, any alarms in the last 24h (from alarm history), and eval accuracy from running the eval suite through live. Keep it under 8 lines." \
@@ -120,8 +124,8 @@ fi
 
 # ── 6. Verify ────────────────────────────────────────────────────────────────
 say "Verifying"
-openclaw models list | grep -i bedrock || echo "!! Bedrock model not listed - check Bedrock access and IAM"
-openclaw skills list | grep -i fleet-ops || echo "!! fleet-ops skill not listed - try: openclaw gateway restart"
+oc models list | grep -i bedrock || echo "!! Bedrock model not listed - check Bedrock access and IAM"
+oc skills list | grep -i fleet-ops || echo "!! fleet-ops skill not listed - try: openclaw gateway restart"
 
 say "Done. Try it:"
 echo '  openclaw agent --message "Use the fleet-ops skill to run a health check on Encoder GPT."'
