@@ -23,7 +23,7 @@ sudo -iu ec2-user bash <<'USEREOF'
 set -euxo pipefail
 
 # Node 24 LTS via nvm (OpenClaw requires Node 24+).
-curl -fsSL https://raw-githubusercontent-com.hhj520.top/nvm-sh/nvm/v0.40.3/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 set +u; . "$NVM_DIR/nvm.sh"; nvm install 24; nvm alias default 24; set -u   # nvm isn't nounset-safe
 
@@ -32,7 +32,7 @@ npm i -g openclaw@latest --allow-scripts=openclaw || npm i -g openclaw@latest
 openclaw --version
 
 # The repo carries the agent's skill, config, and setup script.
-git clone --depth 1 https://gh.hhj520.top/${github_repo} "$HOME/encoder-gpt"
+git clone --depth 1 https://github.com/${github_repo} "$HOME/encoder-gpt"
 chmod +x "$HOME/encoder-gpt/agent/"*.sh
 USEREOF
 
