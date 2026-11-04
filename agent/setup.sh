@@ -109,19 +109,52 @@ done
 sleep 5   # let it finish loading plugins after the port opens
 
 # ── 5. Schedules: proactive checks delivered to the chosen channel ───────────
+# Uses systemd timers rather than OpenClaw's built-in scheduler: in this
+# OpenClaw release, built-in automations require a stored model account or
+# API key, and this agent deliberately has neither (Bedrock auth is the IAM role).
+# Each timer runs one agent turn and delivers the reply with --deliver.
 if [[ -n "$TARGET" ]]; then
-  say "Scheduling health checks and daily digest -> $CHANNEL_KIND"
-  oc cron add \
-    --name "fleet-health-check" \
-    --cron "7 8-18/2 * * 1-5" --tz "America/Chicago" \
-    --message "Use the fleet-ops skill. Run the health check. If anything is in ALARM, diagnose and follow the rollback rules, then post the incident report. If healthy, reply with the one-line healthy status only." \
-    --announce --channel "$CHANNEL_KIND" --to "$TARGET" || echo "(health check may already exist - see: openclaw cron list)"
+  say "Scheduling health checks and daily digest -> $CHANNEL_KIND (systemd timers)"
+  OC_BIN="$(command -v openclaw)"
+  NODE_DIR="$(dirname "$(command -v node)")"
+  UDIR="$HOME/.config/systemd/user"
+  mkdir -p "$UDIR"
 
-  oc cron add \
-    --name "fleet-daily-digest" \
-    --cron "31 8 * * 1-5" --tz "America/Chicago" \
-    --message "Use the fleet-ops skill. Post a morning digest for Encoder GPT: current live version, any alarms in the last 24h (from alarm history), and eval accuracy from running the eval suite through live. Keep it under 8 lines." \
-    --announce --channel "$CHANNEL_KIND" --to "$TARGET" || echo "(digest may already exist - see: openclaw cron list)"
+  write_job() {  # name, schedule, message
+    cat > "$UDIR/fleet-$1.service" <<UNIT
+[Unit]
+Description=Fleet Ops Agent: $1
+After=$UNIT
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.openclaw/fleet-agent.env
+Environment=PATH=$NODE_DIR:/usr/local/bin:/usr/bin:/bin
+TimeoutStartSec=900
+ExecStart=$OC_BIN agent --message "$3" --deliver --reply-channel $CHANNEL_KIND --reply-to $TARGET --thinking low
+UNIT
+    cat > "$UDIR/fleet-$1.timer" <<UNIT
+[Unit]
+Description=Schedule for Fleet Ops Agent: $1
+
+[Timer]
+OnCalendar=$2
+Persistent=false
+
+[Install]
+WantedBy=timers.target
+UNIT
+  }
+
+  write_job health "Mon..Fri 08..18/2:07:00 America/Chicago" \
+    "Use the fleet-ops skill. Run the health check. If anything is in ALARM, diagnose and follow the rollback rules, then post the incident report. If healthy, reply with the one-line healthy status only."
+  write_job digest "Mon..Fri 08:31:00 America/Chicago" \
+    "Use the fleet-ops skill. Post a morning digest for Encoder GPT: current live version, any alarms in the last 24h (from alarm history), and eval accuracy from running the eval suite through live. Keep it under 8 lines."
+
+  systemctl --user daemon-reload
+  systemctl --user enable --now fleet-health.timer fleet-digest.timer
+  systemctl --user list-timers 'fleet-*' --no-pager | head -5
+  echo "  Run one now:  systemctl --user start fleet-health.service"
 else
   echo "No channel/chat ID stored - skipping schedules. You can still chat with the agent directly."
 fi
