@@ -45,6 +45,16 @@ variable "enable_fleet_agent" {
   default     = false
 }
 
+variable "agent_channel" {
+  description = "Where the agent chats and posts digests: slack, telegram, or discord. Email alerts are separate (alarm_email)."
+  type        = string
+  default     = "slack"
+  validation {
+    condition     = contains(["slack", "telegram", "discord"], var.agent_channel)
+    error_message = "agent_channel must be slack, telegram, or discord."
+  }
+}
+
 variable "agent_instance_type" {
   description = "Graviton instance for the agent. t4g.small (2 GB) is the floor for OpenClaw + Node."
   type        = string

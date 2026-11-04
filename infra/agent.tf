@@ -44,7 +44,7 @@ resource "aws_security_group" "agent" {
   vpc_id      = data.aws_vpc.default[0].id
 
   egress {
-    description = "HTTPS to AWS APIs, Slack, npm"
+    description = "HTTPS to AWS APIs, chat platform, npm"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -163,6 +163,15 @@ resource "aws_iam_instance_profile" "agent" {
   count = local.agent_count
   name  = local.agent_name
   role  = aws_iam_role.agent[0].name
+}
+
+# ── Channel choice: read by agent/setup.sh, so switching platforms is a config change ──
+resource "aws_ssm_parameter" "agent_channel" {
+  count = local.agent_count
+  # checkov:skip=CKV2_AWS_34:Not a secret (the platform name); tokens are stored separately as SecureString.
+  name  = "${local.agent_params}/channel"
+  type  = "String"
+  value = var.agent_channel
 }
 
 # ── Compute ─────────────────────────────────────────────────────────────────

@@ -1,0 +1,11 @@
+// Discord: the bot connects out to the Discord gateway, so no inbound ports.
+// Token is referenced from the gateway environment (loaded from SSM by setup.sh).
+// In the Discord developer portal, enable the "Message Content" intent.
+{
+  channels: {
+    discord: {
+      enabled: true,
+      token: { source: "env", provider: "default", id: "DISCORD_BOT_TOKEN" },
+    },
+  },
+}

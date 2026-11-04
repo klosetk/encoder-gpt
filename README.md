@@ -116,7 +116,7 @@ Suggestions are advisory. A certified coder makes the final call.
 
 A persistent [OpenClaw](https://docs.openclaw.ai) agent on EC2 that acts like a junior on-call engineer:
 
-- **Watches** alarms on a schedule and posts a morning digest to Slack
+- **Watches** alarms on a schedule and posts a morning digest to your chat app of choice (Slack, Telegram, or Discord), with email alerts through SNS
 - **Diagnoses** failures by following [`RUNBOOK.md`](RUNBOOK.md) layer by layer
 - **Rolls back** a bad deploy, only when the rules allow it, then verifies with evals
 - **Escalates** problems rollback can't fix (IAM, model access, missing index) with the exact human fix

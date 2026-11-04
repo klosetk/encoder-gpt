@@ -1,0 +1,13 @@
+// Telegram: long polling (outbound only), so the server needs no inbound ports.
+// The bot token comes from the gateway environment (TELEGRAM_BOT_TOKEN, loaded
+// from SSM Parameter Store by setup.sh), never written into this config.
+// Only people you approve through pairing can talk to the agent.
+{
+  channels: {
+    telegram: {
+      enabled: true,
+      dmPolicy: "pairing",
+      groups: { "*": { requireMention: true } },
+    },
+  },
+}

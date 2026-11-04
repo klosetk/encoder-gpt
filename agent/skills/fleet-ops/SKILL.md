@@ -68,7 +68,7 @@ If the cause is NOT a recent deploy (IAM, Bedrock access, missing index), do
 NOT roll back. Rolling back won't fix it. Report the diagnosis and the exact
 human fix from the runbook.
 
-## 4. Report format (Slack)
+## 4. Report format (chat: Slack, Telegram, or Discord)
 ```
 🚨 Encoder GPT incident (<env>)
 What broke: <alarm, since when>
