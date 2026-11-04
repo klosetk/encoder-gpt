@@ -1,49 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="470" viewBox="0 0 1200 470" role="img">
-<rect width="100%" height="100%" rx="16" fill="#0d1117"/>
-<text x="40" y="52" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="24" font-weight="750" fill="#e6edf3" text-anchor="start" opacity="1">What Terraform builds</text>
-<text x="40" y="78" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Every piece of infrastructure is code. One command creates it all; one command removes it.</text>
-<rect x="40" y="108" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
-<rect x="40" y="108" width="360" height="5" rx="2.5" fill="#e8590c"/>
-<text x="56" y="136" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#e8590c" text-anchor="start" opacity="1">FILE</text>
-<text x="56" y="158" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">lambda.tf</text>
-<text x="56" y="182" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Lambda function (container)</text>
-<text x="56" y="202" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">'live' alias for canary/rollback</text>
-<text x="56" y="222" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">log group · X-Ray tracing</text>
-<rect x="420" y="108" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
-<rect x="420" y="108" width="360" height="5" rx="2.5" fill="#0e9f6e"/>
-<text x="436" y="136" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#0e9f6e" text-anchor="start" opacity="1">FILE</text>
-<text x="436" y="158" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">storage.tf</text>
-<text x="436" y="182" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">ECR repo (immutable tags)</text>
-<text x="436" y="202" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">S3 index bucket</text>
-<text x="436" y="222" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">versioning · encryption · prevent_destroy</text>
-<rect x="800" y="108" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
-<rect x="800" y="108" width="360" height="5" rx="2.5" fill="#3b82c4"/>
-<text x="816" y="136" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#3b82c4" text-anchor="start" opacity="1">FILE</text>
-<text x="816" y="158" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">iam.tf</text>
-<text x="816" y="182" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">runtime role</text>
-<text x="816" y="202" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">least-privilege policy</text>
-<text x="816" y="222" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Bedrock · S3 prefix · logs only</text>
-<rect x="40" y="266" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
-<rect x="40" y="266" width="360" height="5" rx="2.5" fill="#e0367a"/>
-<text x="56" y="294" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#e0367a" text-anchor="start" opacity="1">FILE</text>
-<text x="56" y="316" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">observability.tf</text>
-<text x="56" y="340" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">failure alarm (metric math)</text>
-<text x="56" y="360" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">throttle alarm · SNS topic</text>
-<text x="56" y="380" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">log-based metrics</text>
-<rect x="420" y="266" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
-<rect x="420" y="266" width="360" height="5" rx="2.5" fill="#0891b2"/>
-<text x="436" y="294" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#0891b2" text-anchor="start" opacity="1">FILE</text>
-<text x="436" y="316" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">agent.tf</text>
-<text x="436" y="340" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">EC2 Graviton · IMDSv2</text>
-<text x="436" y="360" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Session Manager, 0 open ports</text>
-<text x="436" y="380" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">auto-recover alarms</text>
-<rect x="800" y="266" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
-<rect x="800" y="266" width="360" height="5" rx="2.5" fill="#5b5bd6"/>
-<text x="816" y="294" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#5b5bd6" text-anchor="start" opacity="1">FILE</text>
-<text x="816" y="316" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">ci_oidc.tf</text>
-<text x="816" y="340" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">GitHub OIDC provider</text>
-<text x="816" y="360" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">scoped deploy role</text>
-<text x="816" y="380" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">feature-flagged (Free plan)</text>
-<rect x="40" y="422" width="1120" height="34" rx="10" fill="#1c232d" stroke="#3d444d" stroke-width="1" opacity="1"/>
-<text x="60" y="444" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Remote state in versioned S3 with lockfile locking  ·  lifecycle rules: prevent_destroy, ignore_changes  ·  validated variables per environment</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img">
+<defs><pattern id="ruled" width="1200" height="24" patternUnits="userSpaceOnUse"><path d="M0 23.5 L1200 23.5" stroke="#2C4350" stroke-opacity="0.45" stroke-width="1"/></pattern><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4FB6A8"/></marker><marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#FF7A55"/></marker><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6FCF97"/></marker><marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#FF8A80"/></marker></defs>
+<rect width="1200" height="560" rx="6" fill="#13232B"/>
+<rect x="0" y="0" width="1200" height="560" rx="6" fill="url(#ruled)"/>
+<line x1="30" y1="0" x2="30" y2="560" stroke="#FF7A55" stroke-opacity="0.55" stroke-width="1.5"/>
+<line x1="34" y1="0" x2="34" y2="560" stroke="#FF7A55" stroke-opacity="0.25" stroke-width="1"/>
+<rect x="0.75" y="0.75" width="1198.5" height="558.5" rx="6" fill="none" stroke="#2C4350" stroke-width="1.5"/>
+<text x="44" y="62" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="26" font-weight="650" fill="#F2EEE6" text-anchor="start">What Terraform builds</text>
+<text x="44" y="88" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#A7A196" text-anchor="start">Every resource is code. One command creates it all; one command removes it.</text>
+<rect x="44" y="120" width="350" height="132" rx="2" fill="#182C36" stroke="#2C4350" stroke-width="1"/>
+<rect x="44" y="120" width="4" height="132" fill="#4FB6A8"/>
+<text x="58" y="142" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="11" font-weight="600" letter-spacing="1" fill="#4FB6A8" text-anchor="start">RX-01 · FILE</text>
+<text x="58" y="165" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#F2EEE6" text-anchor="start">lambda.tf</text>
+<text x="58" y="188" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">Lambda function (container)</text>
+<text x="58" y="207" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">'live' alias · canary/rollback</text>
+<text x="58" y="226" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">log group · X-Ray</text>
+<rect x="422" y="120" width="350" height="132" rx="2" fill="#182C36" stroke="#2C4350" stroke-width="1"/>
+<rect x="422" y="120" width="4" height="132" fill="#4FB6A8"/>
+<text x="436" y="142" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="11" font-weight="600" letter-spacing="1" fill="#4FB6A8" text-anchor="start">RX-02 · FILE</text>
+<text x="436" y="165" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#F2EEE6" text-anchor="start">storage.tf</text>
+<text x="436" y="188" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">ECR repo · immutable tags</text>
+<text x="436" y="207" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">S3 index bucket</text>
+<text x="436" y="226" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">versioned · prevent_destroy</text>
+<rect x="800" y="120" width="350" height="132" rx="2" fill="#182C36" stroke="#2C4350" stroke-width="1"/>
+<rect x="800" y="120" width="4" height="132" fill="#4FB6A8"/>
+<text x="814" y="142" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="11" font-weight="600" letter-spacing="1" fill="#4FB6A8" text-anchor="start">RX-03 · FILE</text>
+<text x="814" y="165" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#F2EEE6" text-anchor="start">iam.tf</text>
+<text x="814" y="188" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">runtime role</text>
+<text x="814" y="207" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">least-privilege policy</text>
+<text x="814" y="226" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">Bedrock · 1 S3 prefix · logs</text>
+<rect x="44" y="278" width="350" height="132" rx="2" fill="#182C36" stroke="#2C4350" stroke-width="1"/>
+<rect x="44" y="278" width="4" height="132" fill="#4FB6A8"/>
+<text x="58" y="300" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="11" font-weight="600" letter-spacing="1" fill="#4FB6A8" text-anchor="start">RX-04 · FILE</text>
+<text x="58" y="323" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#F2EEE6" text-anchor="start">observability.tf</text>
+<text x="58" y="346" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">failure alarm (metric math)</text>
+<text x="58" y="365" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">throttle alarm · SNS</text>
+<text x="58" y="384" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">log-based metrics</text>
+<rect x="422" y="278" width="350" height="132" rx="2" fill="#182C36" stroke="#FF7A55" stroke-width="1.5"/>
+<rect x="422" y="278" width="4" height="132" fill="#FF7A55"/>
+<text x="436" y="300" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="11" font-weight="600" letter-spacing="1" fill="#FF7A55" text-anchor="start">RX-05 · FILE</text>
+<text x="436" y="323" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#F2EEE6" text-anchor="start">agent.tf</text>
+<text x="436" y="346" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">EC2 Graviton · IMDSv2</text>
+<text x="436" y="365" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">Session Manager · 0 open ports</text>
+<text x="436" y="384" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">auto-recover alarms</text>
+<rect x="800" y="278" width="350" height="132" rx="2" fill="#182C36" stroke="#2C4350" stroke-width="1"/>
+<rect x="800" y="278" width="4" height="132" fill="#4FB6A8"/>
+<text x="814" y="300" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="11" font-weight="600" letter-spacing="1" fill="#4FB6A8" text-anchor="start">RX-06 · FILE</text>
+<text x="814" y="323" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#F2EEE6" text-anchor="start">ci_oidc.tf</text>
+<text x="814" y="346" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">GitHub OIDC provider</text>
+<text x="814" y="365" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">scoped deploy role</text>
+<text x="814" y="384" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">feature flag (Free plan)</text>
+<line x1="44" y1="446" x2="1156" y2="446" stroke="#4FB6A8" stroke-opacity="0.4"/>
+<text x="44" y="470" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" letter-spacing="1" fill="#4FB6A8" text-anchor="start">STATE</text>
+<text x="160" y="470" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">remote S3 backend · versioning · lockfile locking</text>
+<text x="44" y="492" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" letter-spacing="1" fill="#4FB6A8" text-anchor="start">LIFECYCLE</text>
+<text x="160" y="492" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">prevent_destroy · ignore_changes (CI owns the image)</text>
+<text x="44" y="514" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" letter-spacing="1" fill="#4FB6A8" text-anchor="start">GUARDS</text>
+<text x="160" y="514" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="400" fill="#A7A196" text-anchor="start">validated variables · Checkov in CI</text>
+<rect x="712" y="496" width="470" height="46" rx="2" fill="#1A303B" stroke="#2C4350"/>
+<text x="720" y="512" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="9.5" font-weight="600" letter-spacing="1" fill="#A7A196" text-anchor="start">PATIENT</text>
+<text x="720" y="531" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#FF7A55" text-anchor="start">ENCODER GPT</text>
+<line x1="834" y1="496" x2="834" y2="542" stroke="#2C4350"/>
+<text x="842" y="512" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="9.5" font-weight="600" letter-spacing="1" fill="#A7A196" text-anchor="start">CHART</text>
+<text x="842" y="531" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#F2EEE6" text-anchor="start">4 / 4</text>
+<line x1="898" y1="496" x2="898" y2="542" stroke="#2C4350"/>
+<text x="906" y="512" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="9.5" font-weight="600" letter-spacing="1" fill="#A7A196" text-anchor="start">SECTION</text>
+<text x="906" y="531" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#F2EEE6" text-anchor="start">TERRAFORM</text>
+<line x1="1040" y1="496" x2="1040" y2="542" stroke="#2C4350"/>
+<text x="1048" y="512" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="9.5" font-weight="600" letter-spacing="1" fill="#A7A196" text-anchor="start">REV</text>
+<text x="1048" y="531" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#F2EEE6" text-anchor="start">C</text>
+<line x1="1082" y1="496" x2="1082" y2="542" stroke="#2C4350"/>
+<text x="1090" y="512" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="9.5" font-weight="600" letter-spacing="1" fill="#A7A196" text-anchor="start">REGION</text>
+<text x="1090" y="531" font-family="ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#F2EEE6" text-anchor="start">us-east-2</text>
 </svg>

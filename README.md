@@ -1,114 +1,173 @@
-# Encoder GPT on AWS
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/hero-dark.svg">
+  <img alt="Encoder GPT: from a chatbot prototype to a production AI platform" src="docs/img/hero-light.svg">
+</picture>
 
-**An ICD-10 coding assistant, rebuilt from a prototype into a production-grade AI service on AWS.**
+**An ICD-10 coding assistant I first built as an OpenAI custom GPT, rebuilt as a production-style AI service on AWS, plus a persistent AI agent that operates it.**
 
-The original Encoder GPT was a custom GPT I built on OpenAI with RAG to help coders find accurate ICD-10 codes in a healthcare setting. It worked, but it had the gaps prototypes usually have: PHI protection depended on users following a policy, accuracy was checked by hand, and there was no deployment process, rollback, or monitoring.
+![Terraform](https://img.shields.io/badge/IaC-Terraform-0F6E6E?style=flat-square)
+![AWS Lambda](https://img.shields.io/badge/compute-AWS_Lambda-0F6E6E?style=flat-square)
+![Amazon Bedrock](https://img.shields.io/badge/AI-Amazon_Bedrock-0F6E6E?style=flat-square)
+![Python](https://img.shields.io/badge/python-3.12-0F6E6E?style=flat-square)
+![Checkov](https://img.shields.io/badge/policy_checks-passing-1E7F45?style=flat-square)
+![Status](https://img.shields.io/badge/status-deploying_to_us--east--2-E4572E?style=flat-square)
 
-This repo is the platform version, in two parts:
+| | |
+|---|---|
+| **The problem** | Medical coders lose time hunting for the right ICD-10 code, and mistakes affect claims. |
+| **The prototype** | A custom GPT on OpenAI with RAG. It helped, but PHI safety was a policy ("don't type PHI"), accuracy was checked by hand, and nothing was monitored. |
+| **This rebuild** | Bedrock RAG behind automatic PHI redaction, every piece of infrastructure in Terraform, a deploy pipeline that blocks changes failing an accuracy gate, and an on-call AI agent with a single permission to roll back. |
 
-1. **Encoder GPT:** the AI service, rebuilt on AWS with Bedrock, Terraform, containers, and an eval-gated CI/CD pipeline.
-2. **[Fleet Ops Agent](agent/README.md):** a persistent OpenClaw agent running 24/7 on AWS that *operates* the service. It watches alarms, diagnoses failures from the runbook, rolls back bad deploys, and reports in Slack, with IAM limiting it to read-only access plus a single rollback permission.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/architecture-dark.svg">
+  <img alt="Architecture: client request to Lambda, which redacts PHI, embeds with Titan, retrieves ICD-10 candidates from S3, and reasons with Claude on Bedrock; CloudWatch monitors it and the Fleet Ops Agent can roll back" src="docs/img/architecture-light.svg">
+</picture>
 
-The service part: same job, rebuilt on AWS with Bedrock, Terraform, containers, and a CI/CD pipeline that won't ship a model change unless it passes an accuracy gate.
+**Click a section to expand it.**
 
-> **Status:** reference implementation. Unit tests pass and the Terraform passes `fmt` and Checkov policy checks. *(Update this line once deployed to a sandbox account.)*
+<details>
+<summary><b>DX-01 · Amazon Bedrock: how the AI picks a code</b></summary>
+<br>
 
----
+Each request runs five steps inside Lambda:
 
-## Architecture
-
-```mermaid
-flowchart LR
-    U[Caller] -->|invoke 'live' alias| L[Lambda container<br/>from ECR]
-    L -->|1. scrub PHI| CM[Comprehend Medical]
-    L -->|2. embed query| T[Bedrock Titan<br/>Embeddings]
-    L -->|3. load index| S3[(S3 index<br/>ICD-10 embeddings)]
-    L -->|4. reason over evidence| B[Bedrock Claude]
-    L -->|structured logs, traces| CW[CloudWatch + X-Ray]
-    CW -->|error alarm| SNS[SNS alerts]
-```
-
-**Request flow**
-1. **Redact:** PHI is replaced with `[TYPE]` placeholders *before* anything reaches a model. The backend is swappable via `redaction_mode`:
+1. **Redact PHI.** Identifiers are replaced with `[TYPE]` placeholders *before* any model sees the text. The backend is swappable via `redaction_mode`:
    - `comprehend`: Amazon Comprehend Medical, ML-based, catches names and free-text identifiers (AWS Paid plan)
-   - `basic`: pattern matching for SSNs, phones, emails, dates, and MRN-style IDs. Runs on the Free plan at $0, but **does not reliably catch names or addresses: demo data only, never real PHI**
-2. **Retrieve:** the description is embedded with Titan and matched against ICD-10 reference entries by cosine similarity.
-3. **Reason:** Claude on Bedrock picks codes **only from the retrieved candidates**, returning confidence and a rationale.
-4. **Guard:** any code the model returns that wasn't retrieved is dropped. Low confidence or no match sets `needs_human_review`.
-5. **Observe:** structured logs (never the input text), X-Ray traces, and alarms.
+   - `basic`: pattern matching for SSNs, phones, emails, dates, and MRN-style IDs. Runs at $0 on the Free plan, but **can miss untitled names and addresses: demo data only, never real PHI**
+2. **Embed.** Titan Text Embeddings V2 turns the description into a 512-number vector that captures its meaning.
+3. **Retrieve.** Cosine similarity finds the closest ICD-10 codes in the index (RAG: retrieval-augmented generation).
+4. **Reason.** Claude on Bedrock chooses **only from the retrieved candidates**, with a confidence score and rationale.
+5. **Guard.** Any code Claude returns that wasn't retrieved is dropped. Low confidence or no match sets `needs_human_review`.
+
+**Why Bedrock:** models run inside the AWS account boundary, and access is granted by an IAM role, so there are **no API keys anywhere** in the code or config.
 
 Suggestions are advisory. A certified coder makes the final call.
 
----
+</details>
 
-## Prototype vs. platform
+<details>
+<summary><b>DX-03 · AWS Lambda: why serverless</b></summary>
+<br>
 
-| | Original (custom GPT) | This rebuild |
-|---|---|---|
-| PHI protection | Policy: "don't enter PHI" | Technical control: automatic redaction before the model, with a swappable backend |
-| Model access | OpenAI, consumer tier | Bedrock, inside the AWS account boundary |
-| Credentials | Platform login | IAM role, **no API keys anywhere** |
-| Hallucinated codes | Possible | Model restricted to retrieved candidates, post-filtered |
-| Accuracy checks | Manual spot-checks | Automated eval suite gating every deploy |
-| Deploys | Edit prompt in UI | PR → tests → policy checks → plan → canary → promote/rollback |
-| Monitoring | None | CloudWatch alarms, X-Ray, human-review-rate metric |
-| Infrastructure | Clicked together | Terraform, version-controlled, reviewable |
+- **Runs only when called.** No server to patch or pay for while idle; demo traffic costs pennies.
+- **Container image** from ECR with immutable tags, so a version always means the same code.
+- **Versions + a `live` alias** make canary releases and instant rollback possible: callers always hit `live`, and the pipeline moves it.
+- **Structured logs** record latency, redaction types, and review flags, but never the input text.
 
----
+**Lambda vs. EC2 in this repo:** the coding service is request-driven, so it's Lambda. The Fleet Ops Agent needs to stay connected and run on a schedule, so it's an always-on EC2 instance.
 
-## Delivery pipeline
+</details>
 
-**On every PR** (`.github/workflows/ci.yml`)
-- Unit tests (redaction and retrieval logic, no AWS calls)
-- `terraform fmt -check` and `terraform validate`
-- **Checkov policy checks:** blocks things like public buckets or unencrypted resources
-- `terraform plan` posted as a PR comment so a human reviews the exact infra change
+<details>
+<summary><b>RX · Terraform: every resource is code</b></summary>
+<br>
 
-**On merge to main** (`.github/workflows/deploy.yml`)
-1. Build the container, tagged with the commit SHA (ECR tags are immutable)
-2. Publish a new Lambda version (the old one stays available)
-3. **Eval gate:** run labeled cases against the *new version* before it gets any traffic. Below 85% top-1 accuracy, the deploy stops.
-4. **Canary:** route 10% of `live` traffic to the new version
-5. **Bake:** watch the error alarm for 5 minutes
-6. Healthy → promote to 100% and run a production smoke test through `live`
-7. Unhealthy or any failure → **automatic rollback** to the previous version
-8. **Audit trail:** every version's description is its commit SHA, and the workflow log records who deployed what
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/terraform-dark.svg">
+  <img alt="Terraform files and what each builds" src="docs/img/terraform-light.svg">
+</picture>
 
-AWS access uses **GitHub OIDC**: short-lived tokens, no stored AWS keys.
-
----
-
-## Terraform design decisions
-
-- **Remote state** in versioned, encrypted S3 with native lockfile locking. Versioning means a corrupted or deleted state file can be restored instead of rebuilt with `terraform import`.
+**Design decisions**
+- **Remote state** in versioned, encrypted S3 with lockfile locking. Versioning means a corrupted or deleted state file can be restored instead of rebuilt with `terraform import`.
 - **Partial backend config** (`backend.hcl`), because backend blocks can't read variables.
-- **`lifecycle { ignore_changes = [image_uri] }`** on the Lambda: Terraform owns the function's *shape*, CI/CD owns *which image* runs. Without it, every `terraform apply` would silently roll back the latest deploy.
+- **`ignore_changes = [image_uri]`** on the Lambda: Terraform owns the function's *shape*, CI/CD owns *which image* runs. Without it, every `terraform apply` would silently roll back the latest deploy.
 - **`prevent_destroy`** on the index bucket protects the knowledge base.
-- **Least-privilege IAM:** the runtime role can invoke specific Bedrock model families, read one S3 prefix, and call `DetectPHI`. Nothing else.
-- **Environments** via `var.environment` (validated to dev/staging/prod) with separate state keys per environment.
-- **Reserved concurrency** caps Bedrock spend if a client misbehaves.
+- **Least-privilege IAM:** the runtime role can invoke two model families, read one S3 prefix, and write logs. Nothing else.
+- **Feature flags** for components an account may not allow (GitHub OIDC, reserved concurrency, the agent).
 
-### Policy exceptions
-Skipped Checkov rules, each a deliberate trade-off for a portfolio-scale service:
+**Policy exceptions:** Checkov runs on every PR. Skipped rules are deliberate trade-offs for a portfolio-scale service:
 
 | Rule | Why skipped |
 |---|---|
-| Lambda in VPC (117) | Only calls AWS APIs; a VPC adds NAT cost with no security gain here. Required if it ever touched private data stores. |
+| Lambda in VPC (117) | Only calls AWS APIs; a VPC adds NAT cost with no security gain here. |
 | Lambda DLQ (116) | Invoked synchronously; callers get errors directly. |
 | Code signing (272), env var KMS (173) | Env vars hold no secrets; image integrity comes from immutable, scanned ECR tags. |
-| KMS for logs/ECR/S3 (158, 136, 145) | AWS-managed encryption is on; customer-managed KMS keys add cost without a compliance driver. |
+| Customer-managed KMS (158, 136, 145) | AWS-managed encryption is on; custom keys add cost without a compliance driver. |
 | 1-year log retention (338) | 30 days for dev. Raise for prod per retention policy. |
-| S3 replication, access logs, events, lifecycle (144, 18, 62, 61) | Reference data, rebuildable from the CMS code set. |
+| S3 replication, access logs, events, lifecycle (144, 18, 62, 61) | Reference data, rebuildable from the public CMS code set. |
+| Wildcard on read-only APIs (356, agent only) | CloudWatch and Bedrock list APIs don't support resource scoping. Every write is scoped. |
 
----
+</details>
 
-## Deploy it yourself
+<details>
+<summary><b>TX · Delivery pipeline: trust built into the system</b></summary>
+<br>
 
-Prereqs: AWS account (the Free plan works with `redaction_mode = "basic"`; Comprehend Medical needs the Paid plan), Terraform ≥ 1.10, Docker, and **Bedrock model access enabled** for Claude and Titan Embeddings in your region.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/pipeline-dark.svg">
+  <img alt="Pipeline: pull request checks, then build, publish, eval gate, canary, bake, and promote or roll back" src="docs/img/pipeline-light.svg">
+</picture>
+
+**On every pull request** (`.github/workflows/ci.yml`): unit tests, `terraform fmt` and `validate`, Checkov policy checks, and `terraform plan` posted as a PR comment.
+
+**On every merge** (`.github/workflows/deploy.yml`):
+1. Build the container, tagged with the commit SHA
+2. Publish a new Lambda version (the old one stays available)
+3. **Eval gate:** run labeled cases against the new version *before* it gets traffic; below 85% accuracy, the deploy stops
+4. **Canary:** route 10% of traffic to the new version
+5. **Bake:** watch the failure alarm for 5 minutes
+6. Healthy → promote to 100% and smoke-test through `live`; unhealthy → **automatic rollback**
+
+</details>
+
+<details>
+<summary><b>DX-08 · Fleet Ops Agent: an AI that operates the service</b></summary>
+<br>
+
+A persistent [OpenClaw](https://docs.openclaw.ai) agent on EC2 that acts like a junior on-call engineer:
+
+- **Watches** alarms on a schedule and posts a morning digest to Slack
+- **Diagnoses** failures by following [`RUNBOOK.md`](RUNBOOK.md) layer by layer
+- **Rolls back** a bad deploy, only when the rules allow it, then verifies with evals
+- **Escalates** problems rollback can't fix (IAM, model access, missing index) with the exact human fix
+
+**The safety model:** the agent's instructions say what it *should* do; IAM decides what it *can* do. It has read-only access plus **one** write permission, moving the `live` alias, and an explicit deny blocks code, IAM, and S3 changes. No SSH, no open ports, no stored AWS keys.
+
+Full design and setup: [`agent/README.md`](agent/README.md). `scripts/chaos.sh` simulates a bad deploy for a live demo.
+
+</details>
+
+<details>
+<summary><b>Case notes · Real problems I solved while deploying</b></summary>
+<br>
+
+| Symptom | Diagnosis | Fix |
+|---|---|---|
+| S3 bucket creation denied | The error named an **explicit deny in a service control policy**: an org-level guardrail that overrides account permissions. Tested the same call in another region, and it succeeded, so the account was **locked to its home region**. | Region became a variable (default `us-east-2`) instead of hardcoded. |
+| GitHub OIDC provider denied | Same guardrail blocks creating identity providers on this account type. | Made OIDC an optional feature flag so the core service still deploys. |
+| Lambda rejected reserved concurrency | New accounts get 10 concurrent executions, and AWS requires all 10 to stay unreserved. | Made it configurable, defaulting to unreserved, with the reason documented. |
+| Alarm would never fire on failures | The app catches exceptions and returns HTTP 500, so Lambda's built-in `Errors` metric stays at zero. | Added a log-based failure metric and combined both with alarm metric math. |
+
+The last one was caught by reasoning about *how the code fails*, before it caused a missed incident.
+
+</details>
+
+<details>
+<summary><b>Vitals · Accuracy, PHI, and drift</b></summary>
+<br>
+
+| | Prototype (custom GPT) | This rebuild |
+|---|---|---|
+| PHI protection | Policy: "don't enter PHI" | Automatic redaction before the model, swappable backend |
+| Credentials | Platform login | IAM roles, no API keys |
+| Invented codes | Possible | Restricted to retrieved candidates, then filtered |
+| Accuracy checks | Manual spot-checks | Automated eval suite gating every deploy |
+| Monitoring | None | Alarms, X-Ray traces, human-review-rate metric |
+| Infrastructure | Clicked together | Terraform, version-controlled, reviewable |
+
+**Handling drift:** ICD-10-CM changes every October 1st. The code set, index, prompt, and model are each versioned, and none changes without passing evals and a canary. In production, a rising human-review rate or coder-override rate signals drift that evals missed.
+
+</details>
+
+<details>
+<summary><b>Deploy it yourself</b></summary>
+<br>
+
+Prereqs: an AWS account, Terraform ≥ 1.10, Docker, and Bedrock access to Claude and Titan Embeddings in your region.
 
 ```bash
-# 1. State bucket (once): create a versioned, encrypted S3 bucket, then
-cp infra/backend.hcl.example infra/backend.hcl          # fill in bucket name
+# 1. State bucket (once): a versioned, private S3 bucket in your region, then:
+cp infra/backend.hcl.example infra/backend.hcl          # fill in the bucket name
 cp infra/terraform.tfvars.example infra/terraform.tfvars # fill in github_repo
 
 # 2. Bootstrap: registry first, then push an image so Lambda has something to run
@@ -130,34 +189,33 @@ aws lambda invoke --function-name encoder-gpt-dev --qualifier live \
   --payload '{"description":"Rolled right ankle playing basketball, ligament sprain, first visit"}' out.json && cat out.json
 ```
 
-### Running on an AWS Free plan account
-Free plan accounts sit under AWS-managed guardrails (service control policies). Three defaults handle them:
-- **Region:** projects are locked to their home region. Set `region` to yours (default `us-east-2`). Bedrock still reaches Claude through the cross-region `us.` inference profile.
-- **GitHub OIDC:** creating the OIDC provider is blocked, so `enable_github_oidc = false` and the deploy pipeline skips cleanly. Deploy from CloudShell instead, or turn it on with a Paid plan.
-- **Lambda concurrency:** new accounts have 10 total executions, all of which must stay unreserved, so `lambda_reserved_concurrency = -1`. Set a cap after a quota increase.
+**On an AWS Free plan account,** AWS-managed guardrails apply. The defaults handle them: `region` set to your home region, `enable_github_oidc = false` (deploy from CloudShell), and `lambda_reserved_concurrency = -1`.
 
-Then set GitHub repo variables `AWS_CI_ROLE_ARN`, `AWS_REGION`, `ENVIRONMENT`, and `TF_BACKEND_HCL`.
+**With a Paid plan,** set `enable_github_oidc = true` and the GitHub repo variables `AWS_CI_ROLE_ARN`, `AWS_REGION`, `ENVIRONMENT`, and `TF_BACKEND_HCL` to turn on the automated pipeline.
 
-**Cost:** pennies per day at demo volume. Lambda, S3, and CloudWatch fall in the free tier; you pay per Bedrock and Comprehend Medical call. Run `terraform destroy` when done (remove `prevent_destroy` first).
+**Cost:** pennies at demo volume. Run `terraform destroy` when done (remove `prevent_destroy` first).
 
----
+</details>
 
-## Repo layout
+<details>
+<summary><b>Repo layout</b></summary>
+<br>
 
 ```
 app/        Lambda container: handler, PHI redaction, retrieval
+agent/      Fleet Ops Agent: OpenClaw skill, config, setup
 data/       ICD-10-CM sample (public CMS code set)
-scripts/    Index builder (re-run each October) and chaos.sh (simulated bad deploy)
 evals/      Labeled cases + eval runner used as the deploy gate
+infra/      Terraform: ECR, Lambda, IAM, S3, CloudWatch, OIDC, agent EC2
+scripts/    Index builder and chaos.sh (simulated bad deploy)
 tests/      Unit tests (no AWS needed)
-infra/      Terraform: ECR, Lambda, IAM, S3, CloudWatch, GitHub OIDC, agent EC2
 .github/    CI (PR checks) and Deploy (canary + rollback) workflows
-agent/      Fleet Ops Agent: OpenClaw skill, config, setup (see agent/README.md)
 RUNBOOK.md  How to diagnose failures layer by layer
 ```
 
-## What I'd add next
-- Bedrock Knowledge Bases or OpenSearch Serverless once the corpus grows past the sample
-- Larger eval set built from real (de-identified) coder decisions, tracking accuracy over time
-- Full ICD-10-CM code set and coding guideline documents in the index
-- A small UI for coders, with a thumbs-up/down that feeds the eval set
+</details>
+
+### Next up
+- Index the full ICD-10-CM code set (~74,000 codes) with in-memory vector search, hybrid keyword matching, and code-set versioning
+- Grow the eval set across every ICD-10 chapter and track accuracy over time
+- A small coder UI with thumbs-up/down feedback that feeds the eval set
