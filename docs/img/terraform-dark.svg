@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="470" viewBox="0 0 1200 470" role="img">
+<rect width="100%" height="100%" rx="16" fill="#0d1117"/>
+<text x="40" y="52" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="24" font-weight="750" fill="#e6edf3" text-anchor="start" opacity="1">What Terraform builds</text>
+<text x="40" y="78" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Every piece of infrastructure is code. One command creates it all; one command removes it.</text>
+<rect x="40" y="108" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
+<rect x="40" y="108" width="360" height="5" rx="2.5" fill="#e8590c"/>
+<text x="56" y="136" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#e8590c" text-anchor="start" opacity="1">FILE</text>
+<text x="56" y="158" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">lambda.tf</text>
+<text x="56" y="182" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Lambda function (container)</text>
+<text x="56" y="202" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">'live' alias for canary/rollback</text>
+<text x="56" y="222" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">log group · X-Ray tracing</text>
+<rect x="420" y="108" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
+<rect x="420" y="108" width="360" height="5" rx="2.5" fill="#0e9f6e"/>
+<text x="436" y="136" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#0e9f6e" text-anchor="start" opacity="1">FILE</text>
+<text x="436" y="158" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">storage.tf</text>
+<text x="436" y="182" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">ECR repo (immutable tags)</text>
+<text x="436" y="202" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">S3 index bucket</text>
+<text x="436" y="222" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">versioning · encryption · prevent_destroy</text>
+<rect x="800" y="108" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
+<rect x="800" y="108" width="360" height="5" rx="2.5" fill="#3b82c4"/>
+<text x="816" y="136" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#3b82c4" text-anchor="start" opacity="1">FILE</text>
+<text x="816" y="158" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">iam.tf</text>
+<text x="816" y="182" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">runtime role</text>
+<text x="816" y="202" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">least-privilege policy</text>
+<text x="816" y="222" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Bedrock · S3 prefix · logs only</text>
+<rect x="40" y="266" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
+<rect x="40" y="266" width="360" height="5" rx="2.5" fill="#e0367a"/>
+<text x="56" y="294" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#e0367a" text-anchor="start" opacity="1">FILE</text>
+<text x="56" y="316" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">observability.tf</text>
+<text x="56" y="340" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">failure alarm (metric math)</text>
+<text x="56" y="360" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">throttle alarm · SNS topic</text>
+<text x="56" y="380" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">log-based metrics</text>
+<rect x="420" y="266" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
+<rect x="420" y="266" width="360" height="5" rx="2.5" fill="#0891b2"/>
+<text x="436" y="294" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#0891b2" text-anchor="start" opacity="1">FILE</text>
+<text x="436" y="316" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">agent.tf</text>
+<text x="436" y="340" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">EC2 Graviton · IMDSv2</text>
+<text x="436" y="360" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Session Manager, 0 open ports</text>
+<text x="436" y="380" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">auto-recover alarms</text>
+<rect x="800" y="266" width="360" height="140" rx="12" fill="#151b23" stroke="#3d444d" stroke-width="1" opacity="1"/>
+<rect x="800" y="266" width="360" height="5" rx="2.5" fill="#5b5bd6"/>
+<text x="816" y="294" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#5b5bd6" text-anchor="start" opacity="1">FILE</text>
+<text x="816" y="316" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#e6edf3" text-anchor="start" opacity="1">ci_oidc.tf</text>
+<text x="816" y="340" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">GitHub OIDC provider</text>
+<text x="816" y="360" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">scoped deploy role</text>
+<text x="816" y="380" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">feature-flagged (Free plan)</text>
+<rect x="40" y="422" width="1120" height="34" rx="10" fill="#1c232d" stroke="#3d444d" stroke-width="1" opacity="1"/>
+<text x="60" y="444" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#9198a1" text-anchor="start" opacity="1">Remote state in versioned S3 with lockfile locking  ·  lifecycle rules: prevent_destroy, ignore_changes  ·  validated variables per environment</text>
+</svg>
