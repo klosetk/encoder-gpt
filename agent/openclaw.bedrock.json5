@@ -1,0 +1,29 @@
+// Bedrock as the agent's brain. No API key: auth comes from the EC2
+// instance role through the AWS SDK default credential chain.
+// Applied by setup.sh with: openclaw config patch --file <this file>
+{
+  models: {
+    providers: {
+      "amazon-bedrock": {
+        baseUrl: "https://bedrock-runtime.us-east-1.amazonaws.com",
+        api: "bedrock-converse-stream",
+        auth: "aws-sdk",
+        models: [
+          {
+            id: "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            name: "Claude Sonnet 4.5 (Bedrock)",
+            reasoning: true,
+            input: ["text"],
+            contextWindow: 200000,
+            maxTokens: 8192,
+          },
+        ],
+      },
+    },
+  },
+  agents: {
+    defaults: {
+      model: { primary: "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0" },
+    },
+  },
+}

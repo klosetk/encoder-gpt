@@ -4,7 +4,12 @@
 
 The original Encoder GPT was a custom GPT I built on OpenAI with RAG to help coders find accurate ICD-10 codes in a healthcare setting. It worked, but it had the gaps prototypes usually have: PHI protection depended on users following a policy, accuracy was checked by hand, and there was no deployment process, rollback, or monitoring.
 
-This repo is the platform version: same job, rebuilt on AWS with Bedrock, Terraform, containers, and a CI/CD pipeline that won't ship a model change unless it passes an accuracy gate.
+This repo is the platform version, in two parts:
+
+1. **Encoder GPT:** the AI service, rebuilt on AWS with Bedrock, Terraform, containers, and an eval-gated CI/CD pipeline.
+2. **[Fleet Ops Agent](agent/README.md):** a persistent OpenClaw agent running 24/7 on AWS that *operates* the service. It watches alarms, diagnoses failures from the runbook, rolls back bad deploys, and reports in Slack, with IAM limiting it to read-only access plus a single rollback permission.
+
+The service part: same job, rebuilt on AWS with Bedrock, Terraform, containers, and a CI/CD pipeline that won't ship a model change unless it passes an accuracy gate.
 
 > **Status:** reference implementation. Unit tests pass and the Terraform passes `fmt` and Checkov policy checks. *(Update this line once deployed to a sandbox account.)*
 
@@ -136,11 +141,12 @@ Then set GitHub repo variables `AWS_CI_ROLE_ARN`, `AWS_REGION`, `ENVIRONMENT`, a
 ```
 app/        Lambda container: handler, PHI redaction, retrieval
 data/       ICD-10-CM sample (public CMS code set)
-scripts/    Index builder (re-run each October when CMS updates codes)
+scripts/    Index builder (re-run each October) and chaos.sh (simulated bad deploy)
 evals/      Labeled cases + eval runner used as the deploy gate
 tests/      Unit tests (no AWS needed)
-infra/      Terraform: ECR, Lambda, IAM, S3, CloudWatch, GitHub OIDC
+infra/      Terraform: ECR, Lambda, IAM, S3, CloudWatch, GitHub OIDC, agent EC2
 .github/    CI (PR checks) and Deploy (canary + rollback) workflows
+agent/      Fleet Ops Agent: OpenClaw skill, config, setup (see agent/README.md)
 RUNBOOK.md  How to diagnose failures layer by layer
 ```
 

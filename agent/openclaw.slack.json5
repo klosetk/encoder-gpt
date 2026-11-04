@@ -1,0 +1,14 @@
+// Slack over Socket Mode: the agent opens an outbound connection to Slack,
+// so the server needs NO inbound ports. Tokens are referenced from the
+// gateway's environment (loaded from SSM Parameter Store by setup.sh),
+// never written into this config.
+{
+  channels: {
+    slack: {
+      enabled: true,
+      mode: "socket",
+      appToken: { source: "env", provider: "default", id: "SLACK_APP_TOKEN" },
+      botToken: { source: "env", provider: "default", id: "SLACK_BOT_TOKEN" },
+    },
+  },
+}

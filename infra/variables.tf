@@ -39,6 +39,18 @@ variable "redaction_mode" {
   }
 }
 
+variable "enable_fleet_agent" {
+  description = "Run the persistent Fleet Ops Agent (always-on EC2, ~$12/mo of credits for t4g.small)"
+  type        = bool
+  default     = false
+}
+
+variable "agent_instance_type" {
+  description = "Graviton instance for the agent. t4g.small (2 GB) is the floor for OpenClaw + Node."
+  type        = string
+  default     = "t4g.small"
+}
+
 variable "github_repo" {
   description = "owner/repo allowed to assume the CI role via OIDC"
   type        = string
