@@ -96,8 +96,17 @@ fi
 say "Restarting gateway"
 systemctl --user daemon-reload
 systemctl --user restart "$UNIT"
-sleep 5
 systemctl --user --no-pager status "$UNIT" | head -5
+
+# Wait until the gateway actually accepts connections (it can take a minute
+# on a small instance) instead of racing it with the next commands.
+say "Waiting for the gateway to accept connections"
+for i in $(seq 1 36); do
+  if bash -c 'exec 3<>/dev/tcp/127.0.0.1/18789' 2>/dev/null; then echo "  gateway ready after $((i*5))s"; break; fi
+  sleep 5
+  [[ $i == 36 ]] && echo "!! gateway not reachable after 3 minutes - check: journalctl --user -u $UNIT -n 50"
+done
+sleep 5   # let it finish loading plugins after the port opens
 
 # ── 5. Schedules: proactive checks delivered to the chosen channel ───────────
 if [[ -n "$TARGET" ]]; then
@@ -126,7 +135,6 @@ fi
 
 # ── 6. Verify ────────────────────────────────────────────────────────────────
 say "Verifying"
-sleep 10   # give the restarted gateway a moment before querying it
 oc models list | grep -i bedrock || echo "!! Bedrock model not listed - check Bedrock access and IAM"
 oc skills list | grep -i fleet-ops || echo "!! fleet-ops skill not listed - try: openclaw gateway restart"
 
