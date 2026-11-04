@@ -29,6 +29,16 @@ variable "embed_model_id" {
   default = "amazon.titan-embed-text-v2:0"
 }
 
+variable "redaction_mode" {
+  description = "basic = free pattern matching (demo only); comprehend = Comprehend Medical (Paid plan)"
+  type        = string
+  default     = "basic"
+  validation {
+    condition     = contains(["basic", "comprehend"], var.redaction_mode)
+    error_message = "redaction_mode must be basic or comprehend."
+  }
+}
+
 variable "github_repo" {
   description = "owner/repo allowed to assume the CI role via OIDC"
   type        = string

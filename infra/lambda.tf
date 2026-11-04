@@ -25,6 +25,7 @@ resource "aws_lambda_function" "app" {
       EMBED_MODEL_ID = var.embed_model_id
       INDEX_BUCKET   = aws_s3_bucket.index.bucket
       INDEX_KEY      = "index/icd10_index.json"
+      REDACTION_MODE = var.redaction_mode
     }
   }
 

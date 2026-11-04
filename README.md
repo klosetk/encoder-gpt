@@ -24,7 +24,9 @@ flowchart LR
 ```
 
 **Request flow**
-1. **Redact:** Comprehend Medical detects names, dates, MRNs, and other PHI and replaces them with `[TYPE]` placeholders *before* anything reaches a model.
+1. **Redact:** PHI is replaced with `[TYPE]` placeholders *before* anything reaches a model. The backend is swappable via `redaction_mode`:
+   - `comprehend`: Amazon Comprehend Medical, ML-based, catches names and free-text identifiers (AWS Paid plan)
+   - `basic`: pattern matching for SSNs, phones, emails, dates, and MRN-style IDs. Runs on the Free plan at $0, but **does not reliably catch names or addresses: demo data only, never real PHI**
 2. **Retrieve:** the description is embedded with Titan and matched against ICD-10 reference entries by cosine similarity.
 3. **Reason:** Claude on Bedrock picks codes **only from the retrieved candidates**, returning confidence and a rationale.
 4. **Guard:** any code the model returns that wasn't retrieved is dropped. Low confidence or no match sets `needs_human_review`.
@@ -38,7 +40,7 @@ Suggestions are advisory. A certified coder makes the final call.
 
 | | Original (custom GPT) | This rebuild |
 |---|---|---|
-| PHI protection | Policy: "don't enter PHI" | Technical control: automatic redaction before the model |
+| PHI protection | Policy: "don't enter PHI" | Technical control: automatic redaction before the model, with a swappable backend |
 | Model access | OpenAI, consumer tier | Bedrock, inside the AWS account boundary |
 | Credentials | Platform login | IAM role, **no API keys anywhere** |
 | Hallucinated codes | Possible | Model restricted to retrieved candidates, post-filtered |
@@ -97,7 +99,7 @@ Skipped Checkov rules, each a deliberate trade-off for a portfolio-scale service
 
 ## Deploy it yourself
 
-Prereqs: AWS account, Terraform ≥ 1.10, Docker, and **Bedrock model access enabled** for Claude and Titan Embeddings in your region.
+Prereqs: AWS account (the Free plan works with `redaction_mode = "basic"`; Comprehend Medical needs the Paid plan), Terraform ≥ 1.10, Docker, and **Bedrock model access enabled** for Claude and Titan Embeddings in your region.
 
 ```bash
 # 1. State bucket (once): create a versioned, encrypted S3 bucket, then

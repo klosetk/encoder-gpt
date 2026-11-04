@@ -32,10 +32,14 @@ data "aws_iam_policy_document" "runtime" {
     ]
   }
 
-  statement {
-    sid       = "DetectPHI"
-    actions   = ["comprehendmedical:DetectPHI"]
-    resources = ["*"] # Comprehend Medical does not support resource-level permissions
+  # Only granted when that backend is actually in use (least privilege).
+  dynamic "statement" {
+    for_each = var.redaction_mode == "comprehend" ? [1] : []
+    content {
+      sid       = "DetectPHI"
+      actions   = ["comprehendmedical:DetectPHI"]
+      resources = ["*"] # Comprehend Medical does not support resource-level permissions
+    }
   }
 
   statement {

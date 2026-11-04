@@ -2,3 +2,6 @@ region      = "us-east-1"
 environment = "dev"
 github_repo = "your-github-username/encoder-gpt"
 alarm_email = ""
+
+# "basic" runs on the AWS Free plan. Switch to "comprehend" on a Paid plan.
+redaction_mode = "basic"

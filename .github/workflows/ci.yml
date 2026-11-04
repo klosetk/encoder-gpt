@@ -48,12 +48,14 @@ jobs:
           skip_check: CKV_AWS_117,CKV_AWS_116,CKV_AWS_173,CKV_AWS_272,CKV_AWS_158,CKV_AWS_338,CKV_AWS_136,CKV_AWS_144,CKV_AWS_145,CKV_AWS_18,CKV2_AWS_61,CKV2_AWS_62
 
       - name: Configure AWS (OIDC)
+        if: vars.AWS_CI_ROLE_ARN != ''
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Plan
+        if: vars.AWS_CI_ROLE_ARN != ''
         id: plan
         run: |
           echo "${{ vars.TF_BACKEND_HCL }}" > backend.hcl
@@ -62,6 +64,7 @@ jobs:
           terraform show -no-color tfplan > plan.txt
 
       - name: Comment plan on PR
+        if: vars.AWS_CI_ROLE_ARN != ''
         uses: actions/github-script@v7
         with:
           script: |

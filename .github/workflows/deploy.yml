@@ -24,6 +24,8 @@ env:
 
 jobs:
   deploy:
+    # Skip cleanly until AWS is connected (repo variable AWS_CI_ROLE_ARN set).
+    if: vars.AWS_CI_ROLE_ARN != ''
     runs-on: ubuntu-latest
     environment: ${{ vars.ENVIRONMENT }}   # prod can require manual approval
     steps:
