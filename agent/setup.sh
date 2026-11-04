@@ -7,8 +7,11 @@
 set -euo pipefail
 
 source /etc/profile.d/fleet-agent.sh
+# Node may come from nvm (boot script) or a nodejs.org tarball in ~/.local/node.
+export PATH="$HOME/.local/node/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
-set +u; . "$NVM_DIR/nvm.sh"; set -u   # nvm isn't nounset-safe
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then set +u; . "$NVM_DIR/nvm.sh"; set -u; fi   # nvm isn't nounset-safe
+command -v openclaw >/dev/null || { echo "!! openclaw not found on PATH - install it first (see agent/README.md)"; exit 1; }
 
 AGENT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PARAMS="/encoder-gpt/${FLEET_ENV}/agent"
