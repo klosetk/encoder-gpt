@@ -37,7 +37,9 @@ oc config set plugins.entries.amazon-bedrock.config.discovery.region "$AWS_REGIO
 # ── 2. Skill: the runbook as something the agent can execute ─────────────────
 say "Installing fleet-ops skill"
 mkdir -p "$HOME/.openclaw/workspace/skills"
-ln -sfn "$AGENT_DIR/skills/fleet-ops" "$HOME/.openclaw/workspace/skills/fleet-ops"
+# Copy, don't symlink: OpenClaw rejects skill links that escape its workspace.
+rm -rf "$HOME/.openclaw/workspace/skills/fleet-ops"
+cp -R "$AGENT_DIR/skills/fleet-ops" "$HOME/.openclaw/workspace/skills/fleet-ops"
 
 # ── 3. Chat channel: chosen in Terraform (var.agent_channel), tokens from Parameter Store
 # Supported: slack | telegram | discord. Email alerts are separate (SNS, var.alarm_email).
@@ -124,6 +126,7 @@ fi
 
 # ── 6. Verify ────────────────────────────────────────────────────────────────
 say "Verifying"
+sleep 10   # give the restarted gateway a moment before querying it
 oc models list | grep -i bedrock || echo "!! Bedrock model not listed - check Bedrock access and IAM"
 oc skills list | grep -i fleet-ops || echo "!! fleet-ops skill not listed - try: openclaw gateway restart"
 
