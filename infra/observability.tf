@@ -89,7 +89,9 @@ resource "aws_cloudwatch_metric_alarm" "throttles" {
 resource "aws_cloudwatch_log_metric_filter" "needs_review" {
   name           = "needs-review"
   log_group_name = aws_cloudwatch_log_group.app.name
-  pattern        = "{ $.event = \"suggestion\" && $.needs_review IS TRUE }"
+  # Text match, not a JSON pattern: Lambda prefixes each line with level,
+  # timestamp, and request ID, so CloudWatch can't parse the line as JSON.
+  pattern = "\"needs_review\" true" # both terms on one line = review flagged; healthy lines say false
 
   metric_transformation {
     name      = "NeedsHumanReview"
