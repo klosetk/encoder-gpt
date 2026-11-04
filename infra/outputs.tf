@@ -11,7 +11,7 @@ output "index_bucket" {
 }
 
 output "ci_role_arn" {
-  value = aws_iam_role.ci.arn
+  value = var.enable_github_oidc ? aws_iam_role.ci[0].arn : null
 }
 
 output "agent_instance_id" {

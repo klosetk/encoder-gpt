@@ -13,7 +13,9 @@ resource "aws_lambda_function" "app" {
   publish       = true
 
   # Cap concurrency so a runaway client can't run up the Bedrock bill.
-  reserved_concurrent_executions = 10
+  # -1 = unreserved. New accounts have a 10-execution total and AWS requires
+  # all 10 to stay unreserved, so set a cap only after a quota increase.
+  reserved_concurrent_executions = var.lambda_reserved_concurrency
 
   tracing_config {
     mode = "Active" # X-Ray: see where latency goes (Comprehend vs. embed vs. model)

@@ -51,6 +51,18 @@ variable "agent_instance_type" {
   default     = "t4g.small"
 }
 
+variable "lambda_reserved_concurrency" {
+  description = "Max concurrent executions for the app (-1 = unreserved). Requires an account concurrency quota above 10."
+  type        = number
+  default     = -1
+}
+
+variable "enable_github_oidc" {
+  description = "Create the GitHub OIDC provider + CI role. Blocked on AWS Free plan accounts by an org guardrail."
+  type        = bool
+  default     = false
+}
+
 variable "github_repo" {
   description = "owner/repo allowed to assume the CI role via OIDC"
   type        = string

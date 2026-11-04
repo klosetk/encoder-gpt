@@ -130,6 +130,12 @@ aws lambda invoke --function-name encoder-gpt-dev --qualifier live \
   --payload '{"description":"Rolled right ankle playing basketball, ligament sprain, first visit"}' out.json && cat out.json
 ```
 
+### Running on an AWS Free plan account
+Free plan accounts sit under AWS-managed guardrails (service control policies). Three defaults handle them:
+- **Region:** projects are locked to their home region. Set `region` to yours (default `us-east-2`). Bedrock still reaches Claude through the cross-region `us.` inference profile.
+- **GitHub OIDC:** creating the OIDC provider is blocked, so `enable_github_oidc = false` and the deploy pipeline skips cleanly. Deploy from CloudShell instead, or turn it on with a Paid plan.
+- **Lambda concurrency:** new accounts have 10 total executions, all of which must stay unreserved, so `lambda_reserved_concurrency = -1`. Set a cap after a quota increase.
+
 Then set GitHub repo variables `AWS_CI_ROLE_ARN`, `AWS_REGION`, `ENVIRONMENT`, and `TF_BACKEND_HCL`.
 
 **Cost:** pennies per day at demo volume. Lambda, S3, and CloudWatch fall in the free tier; you pay per Bedrock and Comprehend Medical call. Run `terraform destroy` when done (remove `prevent_destroy` first).
