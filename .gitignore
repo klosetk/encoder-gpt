@@ -1,0 +1,13 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+out.json
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+tfplan
+plan.txt
+infra/backend.hcl
+infra/terraform.tfvars

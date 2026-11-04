@@ -1,0 +1,8 @@
+# Copy to backend.hcl (git-ignored) and fill in. Create the bucket once,
+# by hand or with a tiny bootstrap stack, with versioning + encryption ON
+# so a corrupted or deleted state file can be restored.
+bucket       = "your-tfstate-bucket"
+key          = "encoder-gpt/dev/terraform.tfstate"
+region       = "us-east-1"
+encrypt      = true
+use_lockfile = true

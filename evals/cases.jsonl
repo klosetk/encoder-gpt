@@ -1,0 +1,12 @@
+{"description": "Adult with type 2 diabetes, A1c stable, no complications noted", "expected": "E11.9"}
+{"description": "Type 2 diabetic presenting with blood glucose of 340, hyperglycemic", "expected": "E11.65"}
+{"description": "Follow-up for high blood pressure, primary hypertension, on lisinopril", "expected": "I10"}
+{"description": "Rolled right ankle playing basketball yesterday, ligament sprain, first visit", "expected": "S93.401A"}
+{"description": "Rear-ended in car accident, neck strain/whiplash, initial evaluation", "expected": "S13.4XXA"}
+{"description": "Hit head in fall, concussion, did not lose consciousness, first encounter", "expected": "S06.0X0A"}
+{"description": "Burning and frequency with urination, UTI, site not specified", "expected": "N39.0"}
+{"description": "Chronic heartburn, reflux, endoscopy showed no esophagitis", "expected": "K21.9"}
+{"description": "Patient reports ongoing excessive worry most days for over six months, GAD", "expected": "F41.1"}
+{"description": "Lower back pain for two weeks after lifting boxes, no radiculopathy", "expected": "M54.50"}
+{"description": "Annual physical for adult, all findings normal", "expected": "Z00.00"}
+{"description": "Irregularly irregular heart rhythm on ECG, atrial fibrillation, type not specified", "expected": "I48.91"}

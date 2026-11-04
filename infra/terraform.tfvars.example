@@ -1,0 +1,4 @@
+region      = "us-east-1"
+environment = "dev"
+github_repo = "your-github-username/encoder-gpt"
+alarm_email = ""

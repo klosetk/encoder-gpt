@@ -1,0 +1,102 @@
+# On merge to main: build -> publish new version -> eval gate -> canary 10%
+# -> watch alarms -> promote to 100% or roll back automatically.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths: ["app/**", "evals/**"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-${{ vars.ENVIRONMENT }}
+  cancel-in-progress: false   # never interrupt a rollout halfway
+
+env:
+  FUNCTION: encoder-gpt-${{ vars.ENVIRONMENT }}
+  ALARM: encoder-gpt-${{ vars.ENVIRONMENT }}-errors
+  CANARY_WEIGHT: "0.1"
+  BAKE_SECONDS: "300"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ vars.ENVIRONMENT }}   # prod can require manual approval
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install boto3
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image (tag = commit SHA, immutable)
+        id: image
+        run: |
+          IMAGE="${{ steps.ecr.outputs.registry }}/encoder-gpt-${{ vars.ENVIRONMENT }}:${{ github.sha }}"
+          docker build --platform linux/amd64 --provenance=false -t "$IMAGE" app/
+          docker push "$IMAGE"
+          echo "uri=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Publish new Lambda version
+        id: version
+        run: |
+          aws lambda update-function-code --function-name "$FUNCTION" --image-uri "${{ steps.image.outputs.uri }}"
+          aws lambda wait function-updated --function-name "$FUNCTION"
+          NEW=$(aws lambda publish-version --function-name "$FUNCTION" \
+                  --description "${{ github.sha }}" --query Version --output text)
+          OLD=$(aws lambda get-alias --function-name "$FUNCTION" --name live \
+                  --query FunctionVersion --output text)
+          echo "new=$NEW" >> "$GITHUB_OUTPUT"
+          echo "old=$OLD" >> "$GITHUB_OUTPUT"
+          echo "Audit: commit ${{ github.sha }} by ${{ github.actor }} -> version $NEW (was $OLD)"
+
+      - name: Eval gate (before any user traffic)
+        run: python evals/run_evals.py --function "$FUNCTION" --qualifier "${{ steps.version.outputs.new }}" --threshold 0.85
+
+      - name: Canary — shift 10% of traffic
+        run: |
+          aws lambda update-alias --function-name "$FUNCTION" --name live \
+            --function-version "${{ steps.version.outputs.old }}" \
+            --routing-config "AdditionalVersionWeights={\"${{ steps.version.outputs.new }}\"=$CANARY_WEIGHT}"
+
+      - name: Bake and watch the error alarm
+        id: bake
+        run: |
+          END=$(( $(date +%s) + BAKE_SECONDS ))
+          while [ "$(date +%s)" -lt "$END" ]; do
+            STATE=$(aws cloudwatch describe-alarms --alarm-names "$ALARM" \
+                      --query 'MetricAlarms[0].StateValue' --output text)
+            if [ "$STATE" = "ALARM" ]; then echo "healthy=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+            sleep 30
+          done
+          echo "healthy=true" >> "$GITHUB_OUTPUT"
+
+      - name: Promote to 100%
+        if: steps.bake.outputs.healthy == 'true'
+        run: |
+          aws lambda update-alias --function-name "$FUNCTION" --name live \
+            --function-version "${{ steps.version.outputs.new }}" --routing-config '{}'
+
+      - name: Production verification (smoke test through the live alias)
+        if: steps.bake.outputs.healthy == 'true'
+        run: python evals/run_evals.py --function "$FUNCTION" --qualifier live --threshold 0.85
+
+      - name: Roll back
+        if: failure() || steps.bake.outputs.healthy == 'false'
+        run: |
+          echo "Rolling back to version ${{ steps.version.outputs.old }}"
+          aws lambda update-alias --function-name "$FUNCTION" --name live \
+            --function-version "${{ steps.version.outputs.old }}" --routing-config '{}'
+          exit 1
