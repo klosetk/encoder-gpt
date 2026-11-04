@@ -3,6 +3,6 @@
 # so a corrupted or deleted state file can be restored.
 bucket       = "your-tfstate-bucket"
 key          = "encoder-gpt/dev/terraform.tfstate"
-region       = "us-east-1"
+region       = "us-east-2"
 encrypt      = true
 use_lockfile = true

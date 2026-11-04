@@ -5,7 +5,7 @@
   models: {
     providers: {
       "amazon-bedrock": {
-        baseUrl: "https://bedrock-runtime.us-east-1.amazonaws.com",
+        baseUrl: "https://bedrock-runtime.us-east-2.amazonaws.com",
         api: "bedrock-converse-stream",
         auth: "aws-sdk",
         models: [
