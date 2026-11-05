@@ -28,6 +28,13 @@ param() {  # read an SSM parameter; empty string if it doesn't exist
     --query Parameter.Value --output text --no-cli-pager 2>/dev/null || true
 }
 
+# ── 0. AWS credentials: use this server's IAM role (no keys) ─────────────────
+# OpenClaw can't detect EC2 instance-role credentials on its own, so name a
+# profile that sources them from instance metadata, and set AWS_PROFILE below.
+mkdir -p "$HOME/.aws"
+printf '[default]\nregion = %s\ncredential_source = Ec2InstanceMetadata\n' "$AWS_REGION" > "$HOME/.aws/config"
+export AWS_PROFILE=default
+
 # ── 1. Brain: Bedrock via the instance role (no API key) ─────────────────────
 say "Configuring Bedrock (instance-role auth)"
 oc config patch --file "$AGENT_DIR/openclaw.bedrock.json5"
@@ -77,7 +84,7 @@ if [[ "$READY" == 1 ]]; then
   umask 077   # token file readable by this user only
   {
     printf '%s\n' "${TOKENS[@]}"
-    printf 'AWS_REGION=%s\nAWS_DEFAULT_REGION=%s\nFLEET_ENV=%s\n' "$AWS_REGION" "$AWS_REGION" "$FLEET_ENV"
+    printf 'AWS_PROFILE=default\nAWS_REGION=%s\nAWS_DEFAULT_REGION=%s\nFLEET_ENV=%s\n' "$AWS_REGION" "$AWS_REGION" "$FLEET_ENV"
   } > "$HOME/.openclaw/fleet-agent.env"
   umask 022
 

@@ -40,7 +40,7 @@ variable "redaction_mode" {
 }
 
 variable "enable_fleet_agent" {
-  description = "Run the persistent Fleet Ops Agent (always-on EC2, ~$12/mo of credits for t4g.small)"
+  description = "Run the persistent Fleet Ops Agent (always-on EC2, ~$24/mo of credits for t4g.medium)"
   type        = bool
   default     = false
 }
@@ -56,9 +56,9 @@ variable "agent_channel" {
 }
 
 variable "agent_instance_type" {
-  description = "Graviton instance for the agent. t4g.small (2 GB) is the floor for OpenClaw + Node."
+  description = "Graviton instance for the agent. t4g.medium (4 GB) recommended: on t4g.small (2 GB) the OpenClaw gateway stalled under load."
   type        = string
-  default     = "t4g.small"
+  default     = "t4g.medium"
 }
 
 variable "lambda_reserved_concurrency" {
