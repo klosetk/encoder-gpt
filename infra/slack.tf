@@ -26,16 +26,6 @@ resource "aws_cloudwatch_log_group" "slack" {
   retention_in_days = 30
 }
 
-data "aws_iam_policy_document" "lambda_assume" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
 resource "aws_iam_role" "slack" {
   count              = local.slack_count
   name               = local.slack_name
