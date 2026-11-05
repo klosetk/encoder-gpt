@@ -99,6 +99,14 @@ if [[ "$READY" == 1 ]]; then
     oc plugins install "$PLUGIN" || echo "($PLUGIN already installed)"
   fi
   oc config patch --file "$AGENT_DIR/channels/$CHANNEL_KIND.json5"
+
+  # Slack replies only in allowlisted channels (OpenClaw default). Allow just
+  # the ops channel, and only when the bot is @mentioned.
+  if [[ "$CHANNEL_KIND" == "slack" && -n "$ID" ]]; then
+    ALLOW="$(mktemp)"
+    printf '{ channels: { slack: { groupPolicy: "allowlist", channels: { "%s": { enabled: true, requireMention: true } } } } }\n' "$ID" > "$ALLOW"
+    oc config patch --file "$ALLOW"; rm -f "$ALLOW"
+  fi
 else
   echo "No $CHANNEL_KIND tokens in $PARAMS yet - skipping chat. Add them and re-run (see agent/README.md)."
 fi
