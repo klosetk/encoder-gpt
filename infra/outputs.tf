@@ -31,3 +31,13 @@ output "agent_parameter_path" {
 output "errors_alarm_name" {
   value = aws_cloudwatch_metric_alarm.errors.alarm_name
 }
+
+output "slack_request_url" {
+  description = "Paste into your Slack app: Slash Commands -> /encode -> Request URL"
+  value       = var.enable_slack_command ? "${aws_apigatewayv2_api.slack[0].api_endpoint}/slack" : null
+}
+
+output "slack_secret_parameter" {
+  description = "Store your Slack app's Signing Secret here (SecureString)"
+  value       = local.slack_secret_param
+}

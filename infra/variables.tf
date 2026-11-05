@@ -55,6 +55,12 @@ variable "agent_channel" {
   }
 }
 
+variable "enable_slack_command" {
+  description = "Slack /encode command (public HTTPS endpoint; only Slack-signed requests reach the model). Each use is one Bedrock call."
+  type        = bool
+  default     = false
+}
+
 variable "agent_instance_type" {
   description = "Graviton instance for the agent. t4g.small (2 GB) plus a 4 GB swap file; use t4g.medium on a Paid plan (Free plan blocks resizing)."
   type        = string

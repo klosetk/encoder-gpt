@@ -128,6 +128,38 @@ Full design and setup: [`agent/README.md`](agent/README.md). `scripts/chaos.sh` 
 </details>
 
 <details>
+<summary><b>DX-09 · Slack /encode: coding where coders already work</b></summary>
+<br>
+
+Coders type `/encode rolled right ankle playing basketball, first visit` in Slack and get suggested codes back, visible only to them.
+
+```
+Slack ──signed POST──▶ API Gateway ──▶ Slack Lambda ──▶ Encoder GPT (live alias) ──▶ answer in Slack
+```
+
+- **Verified before it costs anything:** every request must carry a valid Slack signature less than 5 minutes old. Anything else is rejected before a model call.
+- **Fits Slack's 3-second rule:** the function replies "coding that now", re-invokes itself in the background, then posts the result to Slack.
+- **PHI-aware:** answers are only visible to the requester, the note text is never logged or echoed, and redaction still runs inside Encoder GPT.
+- **Least privilege:** it can call only the `live` alias, read one secret, and write its own logs. API Gateway throttles to 1 request per second.
+- **Off by default.** Each use is one Bedrock call (about a cent).
+
+<details>
+<summary>Setup (about 10 minutes)</summary>
+
+1. [api.slack.com/apps](https://api.slack.com/apps/new) → **Create New App** → **From scratch**, name it `Encoder GPT`, pick your workspace. Use a separate app from the Fleet Ops bot, because Socket Mode apps receive slash commands over the socket instead of at a URL.
+2. **Basic Information** → copy the **Signing Secret**, then store it from CloudShell:
+   ```bash
+   aws ssm put-parameter --name /encoder-gpt/dev/slack/signing-secret --type SecureString --value '<signing secret>'
+   ```
+3. Set `enable_slack_command = true` in `infra/terraform.tfvars`, then `terraform init -backend-config=backend.hcl && terraform apply` and copy the `slack_request_url` output.
+4. Back in the Slack app: **Slash Commands** → **Create New Command**: command `/encode`, Request URL = that output, description `Suggest ICD-10 codes`. Save.
+5. **Install App** → **Install to Workspace**. Then in any channel: `/encode follow-up for primary hypertension on lisinopril`.
+
+</details>
+
+</details>
+
+<details>
 <summary><b>Case notes · Real problems I solved while deploying</b></summary>
 <br>
 
@@ -203,11 +235,12 @@ aws lambda invoke --function-name encoder-gpt-dev --qualifier live \
 
 ```
 app/        Lambda container: handler, PHI redaction, retrieval
+gateway/    Slack /encode front door (signature check, async reply)
 agent/      Fleet Ops Agent: OpenClaw skill, config, setup
 data/       ICD-10-CM sample (public CMS code set)
 evals/      Labeled cases + eval runner used as the deploy gate
-infra/      Terraform: ECR, Lambda, IAM, S3, CloudWatch, OIDC, agent EC2
-scripts/    Index builder and chaos.sh (simulated bad deploy)
+infra/      Terraform: ECR, Lambda, IAM, S3, CloudWatch, OIDC, agent EC2, Slack API
+scripts/    Index builder, chaos.sh (simulated bad deploy), record_demo.sh
 tests/      Unit tests (no AWS needed)
 .github/    CI (PR checks) and Deploy (canary + rollback) workflows
 RUNBOOK.md  How to diagnose failures layer by layer

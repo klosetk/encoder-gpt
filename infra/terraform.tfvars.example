@@ -10,3 +10,7 @@ redaction_mode = "basic"
 enable_fleet_agent = false
 agent_channel      = "slack" # or "telegram" / "discord"
 alarm_email        = ""      # email alerts via SNS (free tier); set yours to get alarm emails
+
+# Slack /encode command for coders. Off until you've created the Slack app
+# and stored its signing secret (see README "Slack /encode").
+enable_slack_command = false
