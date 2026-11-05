@@ -209,7 +209,9 @@ resource "aws_instance" "agent" {
   }
 
   lifecycle {
-    ignore_changes = [ami] # don't replace the agent (and its memory) every time AWS ships a new AMI
+    # ami: don't replace the agent (and its memory) every time AWS ships a new AMI.
+    # user_data: only runs at first boot; editing it shouldn't stop a live agent.
+    ignore_changes = [ami, user_data]
   }
 }
 

@@ -21,7 +21,7 @@ flowchart LR
 | **Network** | Zero inbound ports. Every chat platform connects outbound (Slack Socket Mode, Telegram long polling, Discord gateway), and admin access is Session Manager, so there are no SSH keys. A public IP provides outbound internet without a $32/month NAT gateway. |
 | **Recovery** | EC2 auto-recovers on host failure and reboots on instance failure; the gateway is a systemd service that restarts on crash. |
 | **Judgment** | Rollback rules are explicit: only for a *recent deploy* while the failure alarm is firing. For IAM, model access, or index problems, rollback won't help, so the agent reports the human fix instead. |
-| **Cost** | Off by default. t4g.medium ≈ $24/month of credits while running (t4g.small stalled under OpenClaw). Stop the instance between demos. |
+| **Cost** | Off by default. t4g.small ≈ $12/month of credits while running, with a 4 GB swap file because OpenClaw can outgrow 2 GB of RAM (Free plan accounts can't resize to t4g.medium). Stop the instance between demos. |
 
 ## Notification channels
 

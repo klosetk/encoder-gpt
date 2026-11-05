@@ -6,6 +6,12 @@ set -euxo pipefail
 exec > >(tee -a /var/log/fleet-agent-bootstrap.log) 2>&1
 
 dnf install -y git jq tar python3-pip
+
+# 4 GB swap: OpenClaw + Node can exceed 2 GB of RAM on a t4g.small and stall.
+if [ ! -f /swapfile ]; then
+  fallocate -l 4G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+  echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+fi
 python3 -m pip install boto3   # for the eval runner the agent uses
 
 # Region for every AWS SDK/CLI call on this box.
