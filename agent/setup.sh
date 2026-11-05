@@ -37,10 +37,10 @@ export AWS_PROFILE=default
 
 # ── 1. Brain: Bedrock via the instance role (no API key) ─────────────────────
 say "Configuring Bedrock (instance-role auth)"
-# The bundled Bedrock plugin doesn't always activate on its own (OpenClaw
-# issue #164379: "No API provider registered for api: bedrock-converse-stream"),
-# so enable it explicitly.
-oc plugins enable amazon-bedrock --accept-capabilities || echo "(amazon-bedrock plugin: enable returned non-zero - check: openclaw plugins list)"
+# Bedrock support ships as a separate plugin package. Without it, every turn
+# fails with "No API provider registered for api: bedrock-converse-stream".
+oc plugins install @openclaw/amazon-bedrock-provider || echo "(amazon-bedrock-provider already installed)"
+oc plugins enable amazon-bedrock --accept-capabilities || echo "(amazon-bedrock plugin: check 'openclaw plugins list')"
 oc config patch --file "$AGENT_DIR/openclaw.bedrock.json5"
 oc config set plugins.entries.amazon-bedrock.config.discovery.enabled true
 oc config set plugins.entries.amazon-bedrock.config.discovery.region "$AWS_REGION"
