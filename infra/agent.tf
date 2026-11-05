@@ -211,7 +211,9 @@ resource "aws_instance" "agent" {
   lifecycle {
     # ami: don't replace the agent (and its memory) every time AWS ships a new AMI.
     # user_data: only runs at first boot; editing it shouldn't stop a live agent.
-    ignore_changes = [ami, user_data]
+    # associate_public_ip_address: reads as false while the instance is stopped,
+    # which would otherwise force a destroy-and-replace of a healthy agent.
+    ignore_changes = [ami, user_data, associate_public_ip_address]
   }
 }
 
